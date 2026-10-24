@@ -1,0 +1,160 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * RPG theme tokens (dark default).
+ * Palette: dark purple base, gold accent, one hue per skill.
+ * `class="dark"` sits on <html> so `dark:` variants stay active.
+ */
+:root {
+  color-scheme: dark;
+
+  --background: hsl(246 39% 19%);
+  --foreground: hsl(245 100% 95%);
+  --card: hsl(246 38% 24%);
+  --card-foreground: hsl(245 100% 95%);
+  --popover: hsl(246 38% 24%);
+  --popover-foreground: hsl(245 100% 95%);
+  --primary: hsl(42 86% 58%);
+  --primary-foreground: hsl(246 39% 19%);
+  --secondary: hsl(246 36% 32%);
+  --secondary-foreground: hsl(245 100% 95%);
+  /* Muted surface matches the palette border (~#3B3570) so empty XP tracks and
+   * other muted fills read as the purple RPG tone, not a brown-gray. */
+  --muted: hsl(246 36% 32%);
+  --muted-foreground: hsl(245 64% 79%);
+  --accent: hsl(246 36% 32%);
+  --accent-foreground: hsl(245 100% 95%);
+  --destructive: hsl(358 75% 59%);
+  --border: hsl(246 36% 32%);
+  --input: hsl(246 36% 32%);
+  --ring: hsl(42 86% 58%);
+  --radius: 0.75rem;
+
+  --skill-programming: hsl(245 60% 67%);
+  --skill-reading: hsl(161 69% 37%);
+  --skill-learning: hsl(15 68% 52%);
+  --skill-ideas: hsl(340 60% 58%);
+
+  /* Tag colors reuse existing theme tokens so tag chips stay on-theme and no
+   * new hex values are introduced. */
+  --tag-neutral: var(--muted-foreground);
+  --tag-gold: var(--primary);
+  --tag-purple: var(--skill-programming);
+  --tag-teal: var(--skill-reading);
+  --tag-orange: var(--skill-learning);
+  --tag-rose: var(--skill-ideas);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-skill-programming: var(--skill-programming);
+  --color-skill-reading: var(--skill-reading);
+  --color-skill-learning: var(--skill-learning);
+  --color-skill-ideas: var(--skill-ideas);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Latin text uses Inter; Arabic glyphs fall through to IBM Plex Sans Arabic,
+   * which is imported in `main.tsx`. */
+  --font-sans:
+    'Inter Variable', 'IBM Plex Sans Arabic', ui-sans-serif, system-ui,
+    sans-serif;
+}
+
+@layer base {
+  /*
+   * `border-border outline-ring/50` sets the default border color. The
+   * scrollbar properties below give every element one unified thin scrollbar:
+   * the thumb uses the theme border color on a transparent track so it reads
+   * as part of the RPG palette instead of the platform default gray. This
+   * replaces the old per-component `scrollbar-thin` utility and covers the
+   * page, the sidebar, dialog bodies, menu panels, lists, and overflowing
+   * textareas alike.
+   */
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  /* Reserve the scrollbar space so the page does not shift sideways when it
+   * moves between a long and a short screen. */
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/*
+ * Fallback for engines without the standard scrollbar properties (older
+ * WebKit). Same border token, transparent track, rounded thumb, no arrow
+ * buttons. The theme has no lighter border token, so there is no hover shade.
+ */
+@supports not (scrollbar-width: thin) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+/*
+ * Arabic sits a touch taller than Latin so ascenders and diacritics are not
+ * clipped. `:dir(rtl)` only matches text whose first strong character is
+ * right-to-left, so English copy keeps the tighter rhythm from the text
+ * utilities. Elements that carry user content opt in with `dir="auto"`.
+ */
+[dir='auto']:dir(rtl) {
+  line-height: 1.7;
+}
+
+/* Keep interactive elements quiet for users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
